@@ -108,3 +108,30 @@ export const deleteForm = async (req: Request, res: Response, next: NextFunction
     res.status(500).json({ message: 'Internal Server Error', error });
   }
 };
+
+// edit form 
+export const editForm = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const formId = req.body.formId;
+
+    const data = {
+      name: req.body.name,
+      description: req.body.description,
+      questions: req.body.questions,
+    };
+
+    console.log("Received form data for update:", data);
+
+    const updatedForm = await FormModel.findByIdAndUpdate(formId, data, { new: true });
+
+    if (!updatedForm) {
+      res.status(404).json({ message: 'Form not found' });
+      return;
+    }
+
+    res.status(200).json(updatedForm);
+  } catch (error) {
+    console.error("Error updating form:", error);
+    res.status(500).json({ message: 'Internal Server Error', error });
+  }
+};
