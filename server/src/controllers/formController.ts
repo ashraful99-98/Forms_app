@@ -165,41 +165,6 @@ export const getAllFormsOfUser = async (
 };
 
 // submit response 
-// export const submitResponse = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-//   try {
-//     const { formId, userId, response } = req.body;
-
-//     // Validate the basic structure
-//     if (!formId || !userId || !Array.isArray(response) || response.length === 0) {
-//       res.status(400).json({ message: 'Form ID, User ID, and at least one response item are required.' });
-//       return;
-//     }
-
-//     // Validate each response item
-//     for (const item of response) {
-//       if (!item.questionId || !item.optionId) {
-//         res.status(400).json({ message: 'Each response item must contain both questionId and optionId.' });
-//         return;
-//       }
-//     }
-
-//     const newResponse = new ResponseModel({
-//       formId,
-//       userId,
-//       response
-//     });
-
-//     const savedResponse = await newResponse.save();
-
-//     res.status(201).json(savedResponse);
-//   } catch (error) {
-//     console.error('Error submitting response:', error);
-//     res.status(500).json({
-//       message: 'Internal Server Error',
-//       error
-//     });
-//   }
-// };
 export const submitResponse = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { formId, userId, response } = req.body;
@@ -235,5 +200,35 @@ export const submitResponse = async (req: Request, res: Response, next: NextFunc
       message: 'Internal Server Error',
       error
     });
+  }
+};
+
+// Get all responses
+export const getAllResponses = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const result = await ResponseModel.find().lean();
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('Error fetching all responses:', error);
+    res.status(500).json({ message: 'Internal Server Error', error });
+  }
+};
+
+// Get responses for a specific form
+export const getResponsesByFormId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { formId } = req.params;
+
+    if (!formId) {
+      res.status(400).json({ message: 'Form ID is required.' });
+      return;
+    }
+
+    const responses = await ResponseModel.find({ formId }).lean();
+
+    res.status(200).json(responses);
+  } catch (error) {
+    console.error('Error fetching responses by form ID:', error);
+    res.status(500).json({ message: 'Internal Server Error', error });
   }
 };
