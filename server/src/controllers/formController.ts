@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import User from '../models/User';
 import { FormModel } from '../models/FormModel';
+import ResponseModel from '../models/responseModel';
 
 // create form 
 export const createForm = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -133,5 +134,106 @@ export const editForm = async (req: Request, res: Response, next: NextFunction):
   } catch (error) {
     console.error("Error updating form:", error);
     res.status(500).json({ message: 'Internal Server Error', error });
+  }
+};
+
+// get All forms of user 
+
+export const getAllFormsOfUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.params.userId;
+    console.log("User ID:", userId);
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    const forms = await FormModel.find({ _id: { $in: user.createdForms } });
+
+    res.status(200).json(forms);
+  } catch (error) {
+    console.error('Error getting user forms:', error);
+    res.status(500).json({ message: 'Internal Server Error', error });
+  }
+};
+
+// submit response 
+// export const submitResponse = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+//   try {
+//     const { formId, userId, response } = req.body;
+
+//     // Validate the basic structure
+//     if (!formId || !userId || !Array.isArray(response) || response.length === 0) {
+//       res.status(400).json({ message: 'Form ID, User ID, and at least one response item are required.' });
+//       return;
+//     }
+
+//     // Validate each response item
+//     for (const item of response) {
+//       if (!item.questionId || !item.optionId) {
+//         res.status(400).json({ message: 'Each response item must contain both questionId and optionId.' });
+//         return;
+//       }
+//     }
+
+//     const newResponse = new ResponseModel({
+//       formId,
+//       userId,
+//       response
+//     });
+
+//     const savedResponse = await newResponse.save();
+
+//     res.status(201).json(savedResponse);
+//   } catch (error) {
+//     console.error('Error submitting response:', error);
+//     res.status(500).json({
+//       message: 'Internal Server Error',
+//       error
+//     });
+//   }
+// };
+export const submitResponse = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { formId, userId, response } = req.body;
+
+    // Validate basic structure
+    if (!formId || !userId || !Array.isArray(response) || response.length === 0) {
+      res.status(400).json({ message: 'Form ID, User ID, and at least one response item are required.' });
+      return;
+    }
+
+    // Validate each response item
+    for (const item of response) {
+      if (!item.questionId || (!item.optionId && !item.answerText)) {
+        res.status(400).json({
+          message: 'Each response must include questionId and at least optionId or answerText.'
+        });
+        return;
+      }
+    }
+
+    const newResponse = new ResponseModel({
+      formId,
+      userId,
+      response
+    });
+
+    const savedResponse = await newResponse.save();
+
+    res.status(201).json(savedResponse);
+  } catch (error) {
+    console.error('Error submitting response:', error);
+    res.status(500).json({
+      message: 'Internal Server Error',
+      error
+    });
   }
 };
