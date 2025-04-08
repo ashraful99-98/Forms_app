@@ -78,3 +78,33 @@ export const getFormById = async (req: Request, res: Response, next: NextFunctio
     res.status(500).json({ message: 'Internal Server Error', error });
   }
 };
+
+// delete form 
+export const deleteForm = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const formId = req.params.formId;
+    const userId = req.params.userId;
+
+    console.log('Deleting Form ID:', formId);
+    console.log('User ID:', userId);
+
+    const form = await FormModel.findById(formId);
+
+    if (!form) {
+      res.status(404).json({ message: 'Form not found or already deleted' });
+      return;
+    }
+
+    // Convert to string for comparison
+    if (form.createdBy.toString() === userId) {
+      await form.deleteOne();
+      console.log('Form deleted');
+      res.status(202).json({ message: 'Form deleted' });
+    } else {
+      res.status(401).json({ message: 'You are not the owner of this form' });
+    }
+  } catch (error) {
+    console.error('Error deleting form:', error);
+    res.status(500).json({ message: 'Internal Server Error', error });
+  }
+};
