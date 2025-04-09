@@ -7,7 +7,6 @@ interface IAnswer {
   answerText?: string;
 }
 
-
 export interface IResponse extends Document {
   formId: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
@@ -15,7 +14,6 @@ export interface IResponse extends Document {
   createdAt?: Date;
   updatedAt?: Date;
 }
-
 
 const ResponseSchema = new Schema<IResponse>(
   {

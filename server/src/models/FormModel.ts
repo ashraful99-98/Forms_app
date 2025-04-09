@@ -49,25 +49,3 @@ const FormSchema = new Schema<IForm>(
 FormSchema.plugin(mongoosePaginate);
 
 export const FormModel = mongoose.model<IForm>('Form', FormSchema);
-
-
-// import mongoose, { Schema, Document } from 'mongoose';
-
-// export interface IForm extends Document {
-//     createdBy: mongoose.Types.ObjectId;
-//     name: string;
-//     description: string;
-//     createdAt?: Date;
-//     updatedAt?: Date;
-// }
-
-// const formSchema = new Schema<IForm>(
-//     {
-//         createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-//         name: { type: String, required: true },
-//         description: { type: String },
-//     },
-//     { timestamps: true }
-// );
-
-// export default mongoose.model<IForm>('Form', formSchema);

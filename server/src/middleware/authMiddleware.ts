@@ -1,21 +1,25 @@
-import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import { Request, Response, NextFunction } from 'express';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || "secret";
-
-export interface AuthRequest extends Request {
-  user?: any;
+interface CustomRequest extends Request {
+  user?: JwtPayload; // The decoded JWT payload will be assigned to the user
 }
 
-export const protect = (req: AuthRequest, res: Response, next: NextFunction) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "Not authorized" });
+const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction): void => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    res.status(401).json({ message: 'Unauthorized' });
+    return;
+  }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
+    req.user = decoded; // Assign the decoded JWT payload to req.user
     next();
-  } catch (err) {
-    res.status(401).json({ message: "Token invalid" });
+  } catch (error) {
+    res.status(401).json({ message: 'Invalid token' });
   }
 };
+
+export default authMiddleware;

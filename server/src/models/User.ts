@@ -1,9 +1,7 @@
 import mongoose, { Document, Schema, PaginateModel } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
-
 export type UserRole = 'admin' | 'user';
-
 export interface IUser extends Document {
   name: string;
   email: string;
@@ -36,10 +34,7 @@ const UserSchema = new Schema<IUser>(
   }
 );
 
-
-
 UserSchema.plugin(mongoosePaginate);
-
 
 const User = mongoose.model<IUser, PaginateModel<IUser>>('User', UserSchema, 'Users');
 
