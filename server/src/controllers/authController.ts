@@ -93,7 +93,7 @@
 import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import User, { IUser } from "../models/User"; // Make sure IUser is exported from your User model
+import User, { IUser } from "../models/User"; 
 import dotenv from "dotenv";
 
 dotenv.config();
