@@ -5,11 +5,57 @@ import { FormModel } from '../models/FormModel';
 import ResponseModel from '../models/responseModel';
 
 // create form 
+// export const createForm = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+//   try {
+//     const { createdBy, name, description } = req.body;
+
+//     if (!createdBy || !name) {
+//       res.status(400).json({ message: 'createdBy and name are required.' });
+//       return;
+//     }
+
+//     if (!mongoose.Types.ObjectId.isValid(createdBy)) {
+//       res.status(400).json({ message: 'Invalid user ID.' });
+//       return;
+//     }
+
+//     const userExists = await User.findById(createdBy);
+//     if (!userExists) {
+//       res.status(404).json({ message: 'User not found.' });
+//       return;
+//     }
+
+//     const newForm = new FormModel({
+//       createdBy,
+//       name,
+//       description,
+//       questions: [],     
+//       formType: 'anonymous', 
+//       stared: false,
+//     });
+
+//     const savedForm = await newForm.save();
+
+//     await User.updateOne(
+//       { _id: createdBy },
+//       { $addToSet: { createdForms: savedForm._id } }
+//     );
+
+//     console.log('Form ID added to user\'s details');
+
+//     res.status(201).json(savedForm);
+//   } catch (error) {
+//     console.error('Error creating form:', error);
+//     next(error);
+//   }
+// };
+
 export const createForm = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { createdBy, name, description } = req.body;
 
     if (!createdBy || !name) {
+      console.warn("Missing createdBy or name", req.body);
       res.status(400).json({ message: 'createdBy and name are required.' });
       return;
     }
@@ -29,8 +75,8 @@ export const createForm = async (req: Request, res: Response, next: NextFunction
       createdBy,
       name,
       description,
-      questions: [],     
-      formType: 'anonymous', 
+      questions: [],
+      formType: 'anonymous',
       stared: false,
     });
 
@@ -41,14 +87,14 @@ export const createForm = async (req: Request, res: Response, next: NextFunction
       { $addToSet: { createdForms: savedForm._id } }
     );
 
-    console.log('Form ID added to user\'s details');
-
+    console.log('Form created and added to user:', savedForm._id);
     res.status(201).json(savedForm);
   } catch (error) {
     console.error('Error creating form:', error);
-    next(error);
+    res.status(500).json({ message: 'Internal server error', error });
   }
 };
+
 
 // forms get 
 export const formsGet = async (req: Request, res: Response, next: NextFunction): Promise<void> => {

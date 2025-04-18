@@ -40,4 +40,3 @@ const User = mongoose.model<IUser, PaginateModel<IUser>>('User', UserSchema, 'Us
 
 export default User;
 
-
